@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a$rnjqd=!%vpbmb!^$5#6ky!ei_kn-zvq6qff%#q$z)lg-u0p&'
+# In Vercel, set `SECRET_KEY` as an Environment Variable.
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-a$rnjqd=!%vpbmb!^$5#6ky!ei_kn-zvq6qff%#q$z)lg-u0p&",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "1") == "1"
 
-ALLOWED_HOSTS = []
+# Vercel needs the deployed hostname(s) present here.
+# Include `.vercel.app` so preview deployments also work.
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "rose-glow-salon.vercel.app",
+    ".vercel.app",
+]
+
+# Vercel terminates TLS and forwards requests to Django, so trust its HTTPS proxy.
+CSRF_TRUSTED_ORIGINS = [
+    "https://rose-glow-salon.vercel.app",
+    "https://*.vercel.app",
+]
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
