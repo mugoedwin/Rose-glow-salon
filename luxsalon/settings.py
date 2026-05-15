@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,10 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # In Vercel, set `SECRET_KEY` as an Environment Variable.
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-a$rnjqd=!%vpbmb!^$5#6ky!ei_kn-zvq6qff%#q$z)lg-u0p&",
-)
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    if os.environ.get("DEBUG", "1") == "1":
+        SECRET_KEY = "django-insecure-a$rnjqd=!%vpbmb!^$5#6ky!ei_kn-zvq6qff%#q$z)lg-u0p&"
+    else:
+        raise ImproperlyConfigured("SECRET_KEY must be set in production.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "1") == "1"
@@ -135,3 +139,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
